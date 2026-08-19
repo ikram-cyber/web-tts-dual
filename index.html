@@ -52,12 +52,13 @@
     </footer>
 
     <script>
-        // KUMPULAN API KEY (Rotasi Otomatis dengan 4 Key)
+        // KUMPULAN API KEY (Rotasi Otomatis dengan 5 Key)
         const API_KEYS = [
             "02cfca14f2bb49b8b53b33ef5c5041d8",
             "c4dd88699ccc4edbbf1e1d1998d10e2f",
             "2994844bc77f4922b2d70aede86f4d3f",
-            "82a56327ec924ea5bf83410811062031" // API Key ke-4 masuk sini
+            "82a56327ec924ea5bf83410811062031",
+            "f935cf37702846558228914e7abeb7bf" // API Key ke-5 mendarat di sini
         ];
 
         function chunkText(text, maxLength) {
@@ -86,7 +87,7 @@
 
             if (!text) return alert("Isi teksnya dulu bos!");
 
-            // Pilih API Key secara acak dari 4 key yang ada
+            // Pilih API Key secara acak dari 5 key yang ada
             const randomApiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
 
             resultArea.classList.remove('hidden');
