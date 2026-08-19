@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Web TTS Dual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-lg border border-gray-700 relative">
+        
+        <a href="gabung.html" class="absolute top-4 right-4 text-xs bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-bold transition duration-200 shadow-lg">
+            🔗 Audio Joiner
+        </a>
+
+        <h2 class="text-2xl font-bold mb-6 text-center text-blue-400 mt-4">Web TTS Dual</h2>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Pilih Pengisi Suara</label>
+                <select id="voice-select" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none text-white">
+                    <optgroup label="Server VoiceRSS (Cowok)">
+                        <option value="id-cowok">🇮🇩 Suara Cowok (Budi)</option>
+                    </optgroup>
+                    <optgroup label="Server Google (Cewek - Unlimited)">
+                        <option value="id">🇮🇩 Suara Cewek (Indonesia)</option>
+                        <option value="ms">🇲🇾 Suara Cewek (Melayu/Upin Ipin)</option>
+                        <option value="jv">🇮🇩 Suara Cewek (Jawa)</option>
+                        <option value="su">🇮🇩 Suara Cewek (Sunda)</option>
+                        <option value="en">🇺🇸 Suara Cewek (Bule/English)</option>
+                        <option value="ja">🇯🇵 Suara Cewek (Anime Jepang)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Teks Naskah</label>
+                <textarea id="text" rows="5" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Masukkan naskah video di sini..."></textarea>
+            </div>
+
+            <button id="btn-generate" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                Generate Link Download 🚀
+            </button>
+        </div>
+
+        <div id="result-area" class="mt-6 hidden space-y-4 pt-6 border-t border-gray-700">
+            <p id="status-text" class="text-sm text-green-400 text-center font-bold">✅ Sukses! Silakan download part di bawah:</p>
+            <div id="download-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 mt-4"></div>
+        </div>
+    </div>
+
+    <!-- Copyright Footer -->
+    <footer class="mt-8 text-center text-xs text-gray-500">
+        &copy; 2026 ikram-cyber. All rights reserved.
+    </footer>
+
+    <script>
+        const API_KEY = "02cfca14f2bb49b8b53b33ef5c5041d8";
+
+        function chunkText(text, maxLength) {
+            const words = text.split(' ');
+            const chunks = [];
+            let current = '';
+            for (let word of words) {
+                if (current.length + word.length + 1 <= maxLength) {
+                    current += (current ? ' ' : '') + word;
+                } else {
+                    if (current) chunks.push(current);
+                    current = word;
+                }
+            }
+            if (current) chunks.push(current);
+            return chunks;
+        }
+
+        const btnGenerate = document.getElementById('btn-generate');
+        const resultArea = document.getElementById('result-area');
+        const downloadList = document.getElementById('download-list');
+
+        btnGenerate.addEventListener('click', () => {
+            const text = document.getElementById('text').value.trim();
+            const voice = document.getElementById('voice-select').value;
+
+            if (!text) return alert("Isi teksnya dulu bos!");
+
+            resultArea.classList.remove('hidden');
+            const chunks = chunkText(text, 150); 
+            let urls = [];
+
+            // LOGIKA DUAL MESIN
+            if (voice === 'id-cowok') {
+                // Mesin VoiceRSS (Suara Cowok)
+                urls = chunks.map(chunk => `https://api.voicerss.org/?key=${API_KEY}&hl=id-id&v=Budi&c=MP3&f=44khz_16bit_stereo&src=${encodeURIComponent(chunk)}`);
+            } else {
+                // Mesin Google (Suara Cewek)
+                urls = chunks.map(chunk => `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=${voice}&q=${encodeURIComponent(chunk)}`);
+            }
+
+            downloadList.innerHTML = ''; 
+            urls.forEach((url, index) => {
+                const btn = document.createElement('a');
+                btn.href = url;
+                btn.target = "_blank";
+                btn.rel = "noopener noreferrer";
+                btn.className = "block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 text-sm";
+                btn.innerHTML = `⬇️ Download Part ${index + 1}`;
+                downloadList.appendChild(btn);
+            });
+        });
+    </script>
+</body>
+</html>
