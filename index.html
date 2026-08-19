@@ -20,7 +20,7 @@
             <div>
                 <label class="block text-sm font-medium mb-1">Pilih Pengisi Suara</label>
                 <select id="voice-select" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none text-white">
-                    <optgroup label="Server VoiceRSS (Cowok)">
+                    <optgroup label="Server VoiceRSS (Cowok - Limit 1050/hari)">
                         <option value="id-cowok">🇮🇩 Suara Cowok (Budi)</option>
                     </optgroup>
                     <optgroup label="Server Google (Cewek - Unlimited)">
@@ -56,7 +56,12 @@
     </footer>
 
     <script>
-        const API_KEY = "02cfca14f2bb49b8b53b33ef5c5041d8";
+        // KUMPULAN API KEY (Rotasi Otomatis)
+        const API_KEYS = [
+            "02cfca14f2bb49b8b53b33ef5c5041d8",
+            "c4dd88699ccc4edbbf1e1d1998d10e2f",
+            "2994844bc77f4922b2d70aede86f4d3f"
+        ];
 
         function chunkText(text, maxLength) {
             const words = text.split(' ');
@@ -84,16 +89,18 @@
 
             if (!text) return alert("Isi teksnya dulu bos!");
 
+            // Pilih API Key secara acak dari 3 key yang ada
+            const randomApiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
+
             resultArea.classList.remove('hidden');
             const chunks = chunkText(text, 150); 
             let urls = [];
 
-            // LOGIKA DUAL MESIN
             if (voice === 'id-cowok') {
-                // Mesin VoiceRSS (Suara Cowok)
-                urls = chunks.map(chunk => `https://api.voicerss.org/?key=${API_KEY}&hl=id-id&v=Budi&c=MP3&f=44khz_16bit_stereo&src=${encodeURIComponent(chunk)}`);
+                // Mesin VoiceRSS menggunakan key yang dirandom
+                urls = chunks.map(chunk => `https://api.voicerss.org/?key=${randomApiKey}&hl=id-id&v=Budi&c=MP3&f=44khz_16bit_stereo&src=${encodeURIComponent(chunk)}`);
             } else {
-                // Mesin Google (Suara Cewek)
+                // Mesin Google
                 urls = chunks.map(chunk => `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=${voice}&q=${encodeURIComponent(chunk)}`);
             }
 
