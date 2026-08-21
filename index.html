@@ -5,7 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Web TTS Dual</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4659624818164596" crossorigin="anonymous"></script>
+    
+    <!-- CSS ANTI-BANNER GOOGLE TRANSLATE -->
+    <style>
+        .goog-te-banner-frame.skiptranslate, iframe.goog-te-banner-frame { display: none !important; }
+        body { top: 0px !important; position: static !important; }
+        .goog-logo-link, .goog-te-gadget span, .goog-te-gadget img { display: none !important; }
+        .goog-te-gadget { color: transparent !important; font-size: 0px !important; }
+        
+        /* Desain Kotak Bahasa */
+        .goog-te-combo {
+            background-color: #374151 !important;
+            color: #ffffff !important;
+            border: 1px solid #4b5563 !important;
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            font-size: 14px !important;
+            outline: none !important;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
     <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-lg border border-gray-700 relative">
@@ -50,77 +72,31 @@
     <footer class="mt-8 text-center text-xs text-gray-500">
         &copy; 2026 ikram-cyber. All rights reserved.
     </footer>
-<!-- Google Native Widget (God Mode) -->
-<style>
-  /* 1. BASMI BANNER GOOGLE VERSI BARU & LAMA */
-  body > div.skiptranslate { display: none !important; }
-  .VIpgJd-Zvi9od-aZ2wEe-wOHMyf, .VIpgJd-Zvi9od-aZ2wEe-wOHMyf-ti6hGc { display: none !important; }
-  iframe.goog-te-banner-frame { display: none !important; }
-  
-  /* 2. KEMBALIKAN POSISI HALAMAN KE ATAS */
-  body { top: 0px !important; position: static !important; margin-top: 0px !important; }
-  html { top: 0px !important; margin-top: 0px !important; }
-  
-  /* 3. BASMI POPUP HOVER KUNING/PUTIH */
-  #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
-  .goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }
-  
-  /* 4. BASMI TULISAN GOOGLE DI BAWAH */
-  .goog-logo-link { display: none !important; }
-  .goog-te-gadget { color: transparent !important; font-size: 0px !important; }
-  
-  /* 5. PERCANTIK KOTAK PILIHAN BAHASA */
-  .goog-te-combo {
-    background-color: #374151 !important;
-    color: #ffffff !important;
-    border: 1px solid #4b5563 !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    font-size: 14px !important;
-    width: auto !important;
-    min-width: 150px;
-    outline: none !important;
-    cursor: pointer;
-    margin: 0 !important;
-  }
-</style>
-<div class="mt-8 mb-10 flex justify-center">
-    <div id="google_translate_element"></div>
-</div>
-<script type="text/javascript">
-  function googleTranslateElementInit() {
-    new google.translate.TranslateElement({
-      pageLanguage: 'id',
-      autoDisplay: false
-    }, 'google_translate_element');
-  }
-  
-  /* JAVASCRIPT GOD MODE: Basmi banner class terbaru secara agresif */
-  setInterval(function() {
-    document.querySelectorAll('.VIpgJd-Zvi9od-aZ2wEe-wOHMyf').forEach(function(el) {
-      el.style.display = 'none';
-    });
-    document.querySelectorAll('iframe.goog-te-banner-frame').forEach(function(el) {
-      el.style.display = 'none';
-    });
-    if(document.body.style.top !== '0px') document.body.style.top = '0px';
-    if(document.body.style.marginTop !== '0px') document.body.style.marginTop = '0px';
-    if(document.documentElement.style.marginTop !== '0px') document.documentElement.style.marginTop = '0px';
-  }, 50);
-</script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     
+    <!-- Widget Bahasa diletakkan aman di sini -->
+    <div class="mt-4 mb-8 text-center">
+        <div id="google_translate_element"></div>
+    </div>
 
+    <!-- Script Translate -->
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({ pageLanguage: 'id', autoDisplay: false }, 'google_translate_element');
+      }
+      // Penjaga gawang biar web gak turun ke bawah gara-gara Google
+      setInterval(() => {
+          if(document.body.style.top !== '0px') document.body.style.top = '0px';
+      }, 100);
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- Script Utama TTS (beserta 7 API Keys) -->
     <script>
-        // KUMPULAN API KEY (Rotasi Otomatis dengan 7 Key)
         const API_KEYS = [
-            "02cfca14f2bb49b8b53b33ef5c5041d8",
-            "c4dd88699ccc4edbbf1e1d1998d10e2f",
-            "2994844bc77f4922b2d70aede86f4d3f",
-            "82a56327ec924ea5bf83410811062031",
-            "f935cf37702846558228914e7abeb7bf",
-            "0c4c9c17b54e42aabff2a6199e726238", // API Key 6
-            "2056986922254f63a69efcf5e2046be7"  // API Key 7
+            "02cfca14f2bb49b8b53b33ef5c5041d8", "c4dd88699ccc4edbbf1e1d1998d10e2f",
+            "2994844bc77f4922b2d70aede86f4d3f", "82a56327ec924ea5bf83410811062031",
+            "f935cf37702846558228914e7abeb7bf", "0c4c9c17b54e42aabff2a6199e726238", 
+            "2056986922254f63a69efcf5e2046be7"
         ];
 
         function chunkText(text, maxLength) {
@@ -146,21 +122,16 @@
         btnGenerate.addEventListener('click', () => {
             const text = document.getElementById('text').value.trim();
             const voice = document.getElementById('voice-select').value;
-
             if (!text) return alert("Isi teksnya dulu bos!");
 
-            // Pilih API Key secara acak dari 7 key yang ada
             const randomApiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-
             resultArea.classList.remove('hidden');
             const chunks = chunkText(text, 150); 
             let urls = [];
 
             if (voice === 'id-cowok') {
-                // Mesin VoiceRSS menggunakan key yang dirandom
                 urls = chunks.map(chunk => `https://api.voicerss.org/?key=${randomApiKey}&hl=id-id&v=Budi&c=MP3&f=44khz_16bit_stereo&src=${encodeURIComponent(chunk)}`);
             } else {
-                // Mesin Google
                 urls = chunks.map(chunk => `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=${voice}&q=${encodeURIComponent(chunk)}`);
             }
 
@@ -175,5 +146,6 @@
                 downloadList.appendChild(btn);
             });
         });
+    </script>
 </body>
 </html>
