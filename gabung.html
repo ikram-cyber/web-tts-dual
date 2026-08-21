@@ -15,7 +15,7 @@
 
         <h2 class="text-2xl font-bold text-blue-400 mt-4 mb-2 text-center">Audio Joiner + BGM</h2>
         
-        <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan part suara, atur jeda otomatis, dan tambah musik latar.</p>
+        <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan part suara, atur jeda spesifik tiap part, dan tambah musik latar.</p>
 
         <div class="space-y-4">
             <!-- Input Suara Utama -->
@@ -24,15 +24,12 @@
                 <input type="file" id="file-input" multiple accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 bg-gray-700 rounded-lg p-2 cursor-pointer">
             </div>
 
-            <!-- Fitur Baru: Pengaturan Jeda -->
-            <div class="mt-2 p-4 border border-gray-600 rounded-lg bg-gray-750">
-                <label class="block text-sm font-medium mb-2 text-blue-300">Pengaturan Jeda Suara</label>
-                <div class="flex items-center gap-3">
-                    <span class="text-sm text-gray-400">Beri jeda antar part:</span>
-                    <input type="number" id="delay-input" min="0" step="0.5" value="0" class="w-20 bg-gray-900 border border-gray-500 rounded p-1 text-center text-white outline-none focus:border-blue-500 font-bold">
-                    <span class="text-sm text-gray-400">Detik</span>
+            <!-- Fitur Baru: Pengaturan Jeda Dinamis (Muncul Otomatis) -->
+            <div id="dynamic-delays-container" class="mt-2 p-4 border border-gray-600 rounded-lg bg-gray-750 hidden">
+                <label class="block text-sm font-medium mb-3 text-blue-300">Pengaturan Jeda Tiap Part</label>
+                <div id="delay-list" class="space-y-2 max-h-40 overflow-y-auto pr-2">
+                    <!-- Kolom jeda akan di-generate oleh JavaScript di sini -->
                 </div>
-                <p class="text-xs text-gray-500 mt-2">*Isi 0 jika ingin nyambung terus tanpa henti.</p>
             </div>
 
             <!-- Input Musik Latar -->
@@ -66,9 +63,45 @@
     </footer>
 
     <script>
+        const fileInput = document.getElementById('file-input');
+        const delayContainer = document.getElementById('dynamic-delays-container');
+        const delayList = document.getElementById('delay-list');
         const volumeSlider = document.getElementById('bgm-volume');
         const volVal = document.getElementById('vol-val');
+        
         volumeSlider.oninput = function() { volVal.innerHTML = Math.round(this.value * 100) + "%"; }
+
+        // SCRIPT PINTAR: Membaca jumlah file dan membuat kolom jeda otomatis
+        fileInput.addEventListener('change', () => {
+            const files = fileInput.files;
+            delayList.innerHTML = ''; // Bersihkan list sebelumnya
+            
+            if (files.length > 1) {
+                delayContainer.classList.remove('hidden');
+                
+                for (let i = 0; i < files.length - 1; i++) {
+                    let name1 = files[i].name;
+                    let name2 = files[i+1].name;
+                    if(name1.length > 15) name1 = name1.substring(0, 15) + '...';
+                    if(name2.length > 15) name2 = name2.substring(0, 15) + '...';
+
+                    delayList.innerHTML += `
+                        <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg border border-gray-600">
+                            <div class="flex flex-col text-xs text-gray-400 w-2/3">
+                                <span class="font-bold text-blue-300">Jeda Part ${i+1} ➡️ Part ${i+2}</span>
+                                <span class="truncate">${name1} ke ${name2}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" class="delay-val w-16 bg-gray-900 border border-gray-500 rounded p-1 text-center text-white outline-none focus:border-blue-500 font-bold" min="0" step="0.1" value="0">
+                                <span class="text-xs text-gray-500">dtk</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                delayContainer.classList.add('hidden');
+            }
+        });
 
         function audioBufferToWav(buffer) {
             const numChannels = buffer.numberOfChannels;
@@ -85,11 +118,9 @@
             } else {
                 result = buffer.getChannelData(0);
             }
-            
             const dataLength = result.length * 2;
             const bufferArray = new ArrayBuffer(44 + dataLength);
             const view = new DataView(bufferArray);
-            
             const writeString = (view, offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
             writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + dataLength, true);
             writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt ');
@@ -98,7 +129,6 @@
             view.setUint32(28, sampleRate * numChannels * 2, true); view.setUint16(32, numChannels * 2, true);
             view.setUint16(34, 16, true); writeString(view, 36, 'data');
             view.setUint32(40, dataLength, true);
-            
             let offset = 44;
             for (let i = 0; i < result.length; i++, offset += 2) {
                 let s = Math.max(-1, Math.min(1, result[i]));
@@ -112,9 +142,13 @@
             const files = document.getElementById('file-input').files;
             const bgmFile = document.getElementById('bgm-input').files[0];
             const bgmVolume = parseFloat(volumeSlider.value);
-            const delaySeconds = parseFloat(document.getElementById('delay-input').value) || 0;
             
             if (files.length === 0) return alert("Pilih file suaranya dulu bos!");
+
+            // Ambil semua nilai jeda yang diinput user
+            const delayInputs = document.querySelectorAll('.delay-val');
+            let delayValues = [];
+            delayInputs.forEach(input => delayValues.push(parseFloat(input.value) || 0));
 
             btnGabung.innerText = "⏳ Sedang Memproses Audio & Jeda...";
             btnGabung.disabled = true;
@@ -122,7 +156,6 @@
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 
-                // 1. Decode semua file suara yang diupload
                 let voiceBuffers = [];
                 for (let i = 0; i < files.length; i++) {
                     const arrayBuffer = await files[i].arrayBuffer();
@@ -130,29 +163,33 @@
                     voiceBuffers.push(audioBuffer);
                 }
                 
-                // 2. Hitung total durasi (termasuk jeda)
+                // Hitung total durasi dengan jeda dinamis
                 let totalDuration = 0;
                 for (let i = 0; i < voiceBuffers.length; i++) {
                     totalDuration += voiceBuffers[i].duration;
-                    if (i < voiceBuffers.length - 1) totalDuration += delaySeconds;
+                    if (i < voiceBuffers.length - 1) {
+                        totalDuration += delayValues[i] || 0; // Tambahkan jeda spesifik
+                    }
                 }
                 if (totalDuration === 0) totalDuration = 0.1;
 
-                // 3. Buat Kanvas Audio Utama
                 const sampleRate = voiceBuffers[0].sampleRate || 44100;
                 const offlineCtx = new OfflineAudioContext(2, Math.ceil(sampleRate * totalDuration), sampleRate);
                 
-                // 4. Susun suara sesuai urutan dengan jeda
+                // Susun audio berdasarkan jeda yang ditentukan
                 let currentTime = 0;
                 for (let i = 0; i < voiceBuffers.length; i++) {
                     const source = offlineCtx.createBufferSource();
                     source.buffer = voiceBuffers[i];
                     source.connect(offlineCtx.destination);
                     source.start(currentTime);
-                    currentTime += voiceBuffers[i].duration + delaySeconds;
+                    
+                    currentTime += voiceBuffers[i].duration;
+                    if (i < voiceBuffers.length - 1) {
+                        currentTime += delayValues[i] || 0; // Majukan waktu sesuai jeda spesifik
+                    }
                 }
                 
-                // 5. Tambahkan Musik Latar jika ada
                 if (bgmFile) {
                     const bgmArrayBuffer = await bgmFile.arrayBuffer();
                     const bgmBuffer = await audioCtx.decodeAudioData(bgmArrayBuffer);
@@ -168,7 +205,6 @@
                     bgmSource.start(0);
                 }
                 
-                // 6. Render dan Download
                 const renderedBuffer = await offlineCtx.startRendering();
                 const wavBlob = audioBufferToWav(renderedBuffer);
                 
@@ -182,7 +218,7 @@
                 
                 const d = new Date();
                 const waktu = `${d.getDate()}-${d.getMonth() + 1}_${d.getHours()}-${d.getMinutes()}`;
-                downloadLink.download = `Audio-Final_${waktu}.wav`; 
+                downloadLink.download = `Audio-Final-CustomJeda_${waktu}.wav`; 
                 
                 resultArea.classList.remove('hidden');
             } catch (err) {
