@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Joiner & Mixer AI</title>
+    <title>Audio Joiner & Mixer</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -15,12 +15,12 @@
 
         <h2 class="text-2xl font-bold text-blue-400 mt-4 mb-2 text-center">Audio Joiner + BGM</h2>
         
-        <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan part suara AI dan tambahkan musik latar secara otomatis.</p>
+        <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan beberapa part audio dan tambahkan musik latar secara otomatis.</p>
 
         <div class="space-y-4">
-            <!-- Input Suara AI -->
+            <!-- Input Suara Utama -->
             <div>
-                <label class="block text-sm font-medium mb-2">1. Pilih File Suara AI (Sesuai Urutan)</label>
+                <label class="block text-sm font-medium mb-2">1. Pilih File Audio Utama (Sesuai Urutan)</label>
                 <input type="file" id="file-input" multiple accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 bg-gray-700 rounded-lg p-2 cursor-pointer">
             </div>
 
@@ -55,14 +55,12 @@
     </footer>
 
     <script>
-        // Update teks volume saat slider digeser
         const volumeSlider = document.getElementById('bgm-volume');
         const volVal = document.getElementById('vol-val');
         volumeSlider.oninput = function() {
             volVal.innerHTML = Math.round(this.value * 100) + "%";
         }
 
-        // Fungsi mengubah AudioBuffer hasil mix menjadi file WAV
         function audioBufferToWav(buffer) {
             const numChannels = buffer.numberOfChannels;
             const sampleRate = buffer.sampleRate;
@@ -115,7 +113,8 @@
             const bgmFile = document.getElementById('bgm-input').files[0];
             const bgmVolume = parseFloat(volumeSlider.value);
             
-            if (files.length === 0) return alert("Pilih file suara AI-nya dulu bos!");
+            // Teks alert sudah diganti menjadi lebih umum
+            if (files.length === 0) return alert("Pilih file audio utamanya dulu bos!");
 
             btnGabung.innerText = "⏳ Sedang Memproses & Mixing...";
             btnGabung.disabled = true;
@@ -129,10 +128,8 @@
                 let extension = "mp3";
 
                 if (!bgmFile) {
-                    // Jika tidak ada musik, gabung instan seperti biasa
                     finalUrl = URL.createObjectURL(voiceBlob);
                 } else {
-                    // Jika ada musik, jalankan mesin Web Audio Mixer
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const voiceBuffer = await audioCtx.decodeAudioData(await voiceBlob.arrayBuffer());
                     const bgmBuffer = await audioCtx.decodeAudioData(await bgmFile.arrayBuffer());
@@ -146,7 +143,7 @@
                     
                     const bgmSource = offlineCtx.createBufferSource();
                     bgmSource.buffer = bgmBuffer;
-                    bgmSource.loop = true; // Musik akan mengulang otomatis jika durasi kurang
+                    bgmSource.loop = true; 
                     
                     const gainNode = offlineCtx.createGain();
                     gainNode.gain.value = bgmVolume; 
@@ -159,7 +156,7 @@
                     const wavBlob = audioBufferToWav(renderedBuffer);
                     
                     finalUrl = URL.createObjectURL(wavBlob);
-                    extension = "wav"; // Hasil akhir wajib WAV jika dimixing di browser
+                    extension = "wav"; 
                 }
                 
                 const audioPlayer = document.getElementById('audio-player');
