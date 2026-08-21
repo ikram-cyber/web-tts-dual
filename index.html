@@ -6,33 +6,26 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Web TTS Dual</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4659624818164596" crossorigin="anonymous"></script>
     
-    <!-- CSS ANTI-BANNER GOOGLE TRANSLATE -->
+    <!-- CSS PEMBASMI TOTAL GOOGLE (HEADLESS MODE) -->
     <style>
-        .goog-te-banner-frame.skiptranslate, iframe.goog-te-banner-frame { display: none !important; }
-        body { top: 0px !important; position: static !important; }
-        .goog-logo-link, .goog-te-gadget span, .goog-te-gadget img { display: none !important; }
-        .goog-te-gadget { color: transparent !important; font-size: 0px !important; }
-        
-        /* Desain Kotak Bahasa */
-        .goog-te-combo {
-            background-color: #374151 !important;
-            color: #ffffff !important;
-            border: 1px solid #4b5563 !important;
-            border-radius: 8px !important;
-            padding: 8px 12px !important;
-            font-size: 14px !important;
-            outline: none !important;
-            cursor: pointer;
-        }
+        /* Sembunyikan widget asli 100% */
+        #google_translate_element { display: none !important; }
+        /* Basmi banner atas & Spasi kosong */
+        .skiptranslate iframe, .goog-te-banner-frame { display: none !important; }
+        body, html { top: 0px !important; position: static !important; margin-top: 0px !important; }
+        /* Basmi popup tooltip (Teks Asli, Beri Rating, dll) yang ngeyel di screenshot */
+        #goog-gt-tt, .goog-te-balloon-frame { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+        .VIpgJd-Zvi9od-aZ2wEe-wOHMyf, .VIpgJd-Zvi9od-aZ2wEe-wOHMyf-ti6hGc { display: none !important; }
+        /* Basmi highlight warna saat teks disentuh */
+        .goog-text-highlight { background-color: transparent !important; box-shadow: none !important; pointer-events: none !important; }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
     <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-lg border border-gray-700 relative">
         
-        <a href="gabung.html" class="absolute top-4 right-4 text-xs bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-bold transition duration-200 shadow-lg">
+        <a href="gabung.html" class="absolute top-4 right-4 text-xs bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-bold transition duration-200 shadow-lg" translate="no">
             🔗 Audio Joiner
         </a>
 
@@ -44,7 +37,7 @@
                 <select id="voice-select" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none text-white">
                     <option value="id-cowok">🇮🇩 Suara Cowok (Budi)</option>
                     <option value="id">🇮🇩 Suara Cewek (Indonesia)</option>
-                    <option value="ms">🇲🇾 Suara Cewek (Melayu/Upin Ipin)</option>
+                    <option value="ms">🇲🇾 Suara Cewek (Melayu)</option>
                     <option value="jv">🇮🇩 Suara Cewek (Jawa)</option>
                     <option value="su">🇮🇩 Suara Cewek (Sunda)</option>
                     <option value="en">🇺🇸 Suara Cewek (Bule/English)</option>
@@ -69,81 +62,74 @@
     </div>
 
     <!-- Copyright Footer -->
-    <footer class="mt-8 text-center text-xs text-gray-500">
+    <footer class="mt-8 text-center text-xs text-gray-500" translate="no">
         &copy; 2026 ikram-cyber. All rights reserved.
     </footer>
     
-    <!-- Widget Bahasa diletakkan aman di sini -->
-    <div class="mt-4 mb-8 text-center">
-        <div id="google_translate_element"></div>
+    <!-- UI TRANSLATE BUATAN SENDIRI (PROFESIONAL) -->
+    <div class="mt-4 mb-8 text-center" translate="no">
+        <select id="custom-lang-select" onchange="gantiBahasa(this.value)" class="bg-gray-800 text-gray-300 border border-gray-600 rounded-lg p-2 text-sm outline-none cursor-pointer focus:ring-2 focus:ring-blue-500">
+            <option value="id">🇮🇩 Bahasa Indonesia</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="ms">🇲🇾 Melayu</option>
+            <option value="jv">🇮🇩 Boso Jowo</option>
+            <option value="su">🇮🇩 Basa Sunda</option>
+            <option value="ja">🇯🇵 日本語 (Jepang)</option>
+            <option value="ar">🇸🇦 العربية (Arab)</option>
+            <option value="zh-CN">🇨🇳 中文 (Mandarin)</option>
+        </select>
     </div>
 
-    <!-- Script Translate -->
+    <!-- SCRIPT TRANSLATE SILUMAN -->
+    <div id="google_translate_element"></div>
     <script type="text/javascript">
-      function googleTranslateElementInit() {
-        new google.translate.TranslateElement({ pageLanguage: 'id', autoDisplay: false }, 'google_translate_element');
-      }
-      // Penjaga gawang biar web gak turun ke bawah gara-gara Google
-      setInterval(() => {
-          if(document.body.style.top !== '0px') document.body.style.top = '0px';
-      }, 100);
+        // Fungsi ganti bahasa tanpa UI Google
+        function gantiBahasa(lang) {
+            document.cookie = "googtrans=/id/" + lang + "; path=/";
+            document.cookie = "googtrans=/id/" + lang + "; domain=" + location.hostname + "; path=/";
+            location.reload(); // Refresh halaman agar bahasa berubah
+        }
+        
+        // Cek bahasa saat ini dari Cookie
+        window.addEventListener('DOMContentLoaded', () => {
+            let match = document.cookie.match(/(^|;) ?googtrans=([^;]*)(;|$)/);
+            let currentLang = match ? match[2].split('/')[2] : 'id';
+            let select = document.getElementById('custom-lang-select');
+            if(select) select.value = currentLang;
+        });
+
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'id', autoDisplay: false }, 'google_translate_element');
+        }
+        setInterval(() => { if(document.body.style.top !== '0px') document.body.style.top = '0px'; }, 100);
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-    <!-- Script Utama TTS (beserta 7 API Keys) -->
+    <!-- SCRIPT TTS UTAMA -->
     <script>
-        const API_KEYS = [
-            "02cfca14f2bb49b8b53b33ef5c5041d8", "c4dd88699ccc4edbbf1e1d1998d10e2f",
-            "2994844bc77f4922b2d70aede86f4d3f", "82a56327ec924ea5bf83410811062031",
-            "f935cf37702846558228914e7abeb7bf", "0c4c9c17b54e42aabff2a6199e726238", 
-            "2056986922254f63a69efcf5e2046be7"
-        ];
-
+        const API_KEYS = ["02cfca14f2bb49b8b53b33ef5c5041d8", "c4dd88699ccc4edbbf1e1d1998d10e2f", "2994844bc77f4922b2d70aede86f4d3f", "82a56327ec924ea5bf83410811062031", "f935cf37702846558228914e7abeb7bf", "0c4c9c17b54e42aabff2a6199e726238", "2056986922254f63a69efcf5e2046be7"];
         function chunkText(text, maxLength) {
-            const words = text.split(' ');
-            const chunks = [];
-            let current = '';
+            const words = text.split(' '); const chunks = []; let current = '';
             for (let word of words) {
-                if (current.length + word.length + 1 <= maxLength) {
-                    current += (current ? ' ' : '') + word;
-                } else {
-                    if (current) chunks.push(current);
-                    current = word;
-                }
+                if (current.length + word.length + 1 <= maxLength) { current += (current ? ' ' : '') + word; } 
+                else { if (current) chunks.push(current); current = word; }
             }
-            if (current) chunks.push(current);
-            return chunks;
+            if (current) chunks.push(current); return chunks;
         }
-
-        const btnGenerate = document.getElementById('btn-generate');
-        const resultArea = document.getElementById('result-area');
-        const downloadList = document.getElementById('download-list');
-
-        btnGenerate.addEventListener('click', () => {
+        document.getElementById('btn-generate').addEventListener('click', () => {
             const text = document.getElementById('text').value.trim();
             const voice = document.getElementById('voice-select').value;
             if (!text) return alert("Isi teksnya dulu bos!");
-
             const randomApiKey = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-            resultArea.classList.remove('hidden');
-            const chunks = chunkText(text, 150); 
-            let urls = [];
-
-            if (voice === 'id-cowok') {
-                urls = chunks.map(chunk => `https://api.voicerss.org/?key=${randomApiKey}&hl=id-id&v=Budi&c=MP3&f=44khz_16bit_stereo&src=${encodeURIComponent(chunk)}`);
-            } else {
-                urls = chunks.map(chunk => `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=${voice}&q=${encodeURIComponent(chunk)}`);
-            }
-
-            downloadList.innerHTML = ''; 
+            document.getElementById('result-area').classList.remove('hidden');
+            const chunks = chunkText(text, 150); let urls = [];
+            if (voice === 'id-cowok') { urls = chunks.map(chunk => `https://api.voicerss.org/?key=${randomApiKey}&hl=id-id&v=Budi&c=MP3&f=44khz_16bit_stereo&src=${encodeURIComponent(chunk)}`); } 
+            else { urls = chunks.map(chunk => `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=${voice}&q=${encodeURIComponent(chunk)}`); }
+            const downloadList = document.getElementById('download-list'); downloadList.innerHTML = ''; 
             urls.forEach((url, index) => {
-                const btn = document.createElement('a');
-                btn.href = url;
-                btn.target = "_blank";
-                btn.rel = "noopener noreferrer";
+                const btn = document.createElement('a'); btn.href = url; btn.target = "_blank"; btn.rel = "noopener noreferrer";
                 btn.className = "block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 text-sm";
-                btn.innerHTML = `⬇️ Download Part ${index + 1}`;
-                downloadList.appendChild(btn);
+                btn.innerHTML = `⬇️ Download Part ${index + 1}`; downloadList.appendChild(btn);
             });
         });
     </script>

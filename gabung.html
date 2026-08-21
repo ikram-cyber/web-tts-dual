@@ -5,60 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Joiner & Mixer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4659624818164596" crossorigin="anonymous"></script>
 
-    <!-- CSS ANTI-BANNER GOOGLE TRANSLATE -->
+    <!-- CSS PEMBASMI TOTAL GOOGLE (HEADLESS MODE) -->
     <style>
-        .goog-te-banner-frame.skiptranslate, iframe.goog-te-banner-frame { display: none !important; }
-        body { top: 0px !important; position: static !important; }
-        .goog-logo-link, .goog-te-gadget span, .goog-te-gadget img { display: none !important; }
-        .goog-te-gadget { color: transparent !important; font-size: 0px !important; }
-        
-        /* Desain Kotak Bahasa */
-        .goog-te-combo {
-            background-color: #374151 !important;
-            color: #ffffff !important;
-            border: 1px solid #4b5563 !important;
-            border-radius: 8px !important;
-            padding: 8px 12px !important;
-            font-size: 14px !important;
-            outline: none !important;
-            cursor: pointer;
-        }
+        #google_translate_element { display: none !important; }
+        .skiptranslate iframe, .goog-te-banner-frame { display: none !important; }
+        body, html { top: 0px !important; position: static !important; margin-top: 0px !important; }
+        #goog-gt-tt, .goog-te-balloon-frame { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+        .VIpgJd-Zvi9od-aZ2wEe-wOHMyf, .VIpgJd-Zvi9od-aZ2wEe-wOHMyf-ti6hGc { display: none !important; }
+        .goog-text-highlight { background-color: transparent !important; box-shadow: none !important; pointer-events: none !important; }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
     <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-lg border border-gray-700 relative">
         
-        <a href="index.html" class="absolute top-4 right-4 text-xs bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-bold transition duration-200 shadow-lg">
+        <a href="index.html" class="absolute top-4 right-4 text-xs bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-bold transition duration-200 shadow-lg" translate="no">
             🔙 Kembali ke TTS
         </a>
 
         <h2 class="text-2xl font-bold text-blue-400 mt-4 mb-2 text-center">Audio Joiner + BGM</h2>
-        
         <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan part suara, atur jeda spesifik tiap part, dan tambah musik latar.</p>
 
         <div class="space-y-4">
-            <!-- Input Suara Utama -->
             <div>
                 <label class="block text-sm font-medium mb-2">1. Pilih File Suara (Sesuai Urutan)</label>
                 <input type="file" id="file-input" multiple accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 bg-gray-700 rounded-lg p-2 cursor-pointer">
             </div>
 
-            <!-- Fitur Baru: Pengaturan Jeda Dinamis -->
             <div id="dynamic-delays-container" class="mt-2 p-4 border border-gray-600 rounded-lg bg-gray-750 hidden">
                 <label class="block text-sm font-medium mb-3 text-blue-300">Pengaturan Jeda Tiap Part</label>
-                <div id="delay-list" class="space-y-2 max-h-40 overflow-y-auto pr-2">
-                    <!-- Kolom jeda akan di-generate oleh JavaScript di sini -->
-                </div>
+                <div id="delay-list" class="space-y-2 max-h-40 overflow-y-auto pr-2"></div>
             </div>
 
-            <!-- Input Musik Latar -->
             <div class="mt-4 p-4 border border-gray-600 rounded-lg bg-gray-750">
                 <label class="block text-sm font-medium mb-2 text-yellow-400">2. Tambah Musik Latar (Opsional)</label>
                 <input type="file" id="bgm-input" accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-yellow-600 file:text-white hover:file:bg-yellow-700 bg-gray-800 rounded-lg p-2 cursor-pointer">
-                
                 <div class="mt-4">
                     <label class="block text-xs text-gray-300 mb-1">Volume Musik Latar: <span id="vol-val">10%</span></label>
                     <input type="range" id="bgm-volume" min="0.01" max="1" step="0.01" value="0.1" class="w-full cursor-pointer">
@@ -80,27 +62,46 @@
     </div>
 
     <!-- Copyright Footer -->
-    <footer class="mt-8 text-center text-xs text-gray-500">
+    <footer class="mt-8 text-center text-xs text-gray-500" translate="no">
         &copy; 2026 ikram-cyber. All rights reserved.
     </footer>
 
-    <!-- Widget Bahasa diletakkan aman di sini -->
-    <div class="mt-4 mb-8 text-center">
-        <div id="google_translate_element"></div>
+    <!-- UI TRANSLATE BUATAN SENDIRI -->
+    <div class="mt-4 mb-8 text-center" translate="no">
+        <select id="custom-lang-select" onchange="gantiBahasa(this.value)" class="bg-gray-800 text-gray-300 border border-gray-600 rounded-lg p-2 text-sm outline-none cursor-pointer focus:ring-2 focus:ring-blue-500">
+            <option value="id">🇮🇩 Bahasa Indonesia</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="ms">🇲🇾 Melayu</option>
+            <option value="jv">🇮🇩 Boso Jowo</option>
+            <option value="su">🇮🇩 Basa Sunda</option>
+            <option value="ja">🇯🇵 日本語 (Jepang)</option>
+            <option value="ar">🇸🇦 العربية (Arab)</option>
+            <option value="zh-CN">🇨🇳 中文 (Mandarin)</option>
+        </select>
     </div>
 
-    <!-- Script Translate -->
+    <!-- SCRIPT TRANSLATE SILUMAN -->
+    <div id="google_translate_element"></div>
     <script type="text/javascript">
-      function googleTranslateElementInit() {
-        new google.translate.TranslateElement({ pageLanguage: 'id', autoDisplay: false }, 'google_translate_element');
-      }
-      // Penjaga gawang biar web gak turun
-      setInterval(() => {
-          if(document.body.style.top !== '0px') document.body.style.top = '0px';
-      }, 100);
+        function gantiBahasa(lang) {
+            document.cookie = "googtrans=/id/" + lang + "; path=/";
+            document.cookie = "googtrans=/id/" + lang + "; domain=" + location.hostname + "; path=/";
+            location.reload(); 
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            let match = document.cookie.match(/(^|;) ?googtrans=([^;]*)(;|$)/);
+            let currentLang = match ? match[2].split('/')[2] : 'id';
+            let select = document.getElementById('custom-lang-select');
+            if(select) select.value = currentLang;
+        });
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'id', autoDisplay: false }, 'google_translate_element');
+        }
+        setInterval(() => { if(document.body.style.top !== '0px') document.body.style.top = '0px'; }, 100);
     </script>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
+    <!-- SCRIPT AUDIO JOINER UTAMA -->
     <script>
         const fileInput = document.getElementById('file-input');
         const delayContainer = document.getElementById('dynamic-delays-container');
@@ -110,20 +111,14 @@
         
         volumeSlider.oninput = function() { volVal.innerHTML = Math.round(this.value * 100) + "%"; }
 
-        // SCRIPT PINTAR: Membaca jumlah file dan membuat kolom jeda otomatis
         fileInput.addEventListener('change', () => {
-            const files = fileInput.files;
-            delayList.innerHTML = ''; 
-            
+            const files = fileInput.files; delayList.innerHTML = ''; 
             if (files.length > 1) {
                 delayContainer.classList.remove('hidden');
-                
                 for (let i = 0; i < files.length - 1; i++) {
-                    let name1 = files[i].name;
-                    let name2 = files[i+1].name;
+                    let name1 = files[i].name; let name2 = files[i+1].name;
                     if(name1.length > 15) name1 = name1.substring(0, 15) + '...';
                     if(name2.length > 15) name2 = name2.substring(0, 15) + '...';
-
                     delayList.innerHTML += `
                         <div class="flex items-center justify-between bg-gray-800 p-3 rounded-lg border border-gray-600">
                             <div class="flex flex-col text-xs text-gray-400 w-2/3">
@@ -137,41 +132,26 @@
                         </div>
                     `;
                 }
-            } else {
-                delayContainer.classList.add('hidden');
-            }
+            } else { delayContainer.classList.add('hidden'); }
         });
 
         function audioBufferToWav(buffer) {
-            const numChannels = buffer.numberOfChannels;
-            const sampleRate = buffer.sampleRate;
-            let result;
+            const numChannels = buffer.numberOfChannels; const sampleRate = buffer.sampleRate; let result;
             if (numChannels === 2) {
                 result = new Float32Array(buffer.length * 2);
-                const left = buffer.getChannelData(0);
-                const right = buffer.getChannelData(1);
-                for (let i = 0; i < buffer.length; i++) {
-                    result[i * 2] = left[i];
-                    result[i * 2 + 1] = right[i];
-                }
-            } else {
-                result = buffer.getChannelData(0);
-            }
-            const dataLength = result.length * 2;
-            const bufferArray = new ArrayBuffer(44 + dataLength);
+                const left = buffer.getChannelData(0); const right = buffer.getChannelData(1);
+                for (let i = 0; i < buffer.length; i++) { result[i * 2] = left[i]; result[i * 2 + 1] = right[i]; }
+            } else { result = buffer.getChannelData(0); }
+            const dataLength = result.length * 2; const bufferArray = new ArrayBuffer(44 + dataLength);
             const view = new DataView(bufferArray);
             const writeString = (view, offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
             writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + dataLength, true);
             writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true); view.setUint16(20, 1, true);
-            view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * numChannels * 2, true); view.setUint16(32, numChannels * 2, true);
-            view.setUint16(34, 16, true); writeString(view, 36, 'data');
-            view.setUint32(40, dataLength, true);
+            view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * numChannels * 2, true); view.setUint16(32, numChannels * 2, true); view.setUint16(34, 16, true); writeString(view, 36, 'data'); view.setUint32(40, dataLength, true);
             let offset = 44;
             for (let i = 0; i < result.length; i++, offset += 2) {
-                let s = Math.max(-1, Math.min(1, result[i]));
-                view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+                let s = Math.max(-1, Math.min(1, result[i])); view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
             }
             return new Blob([view], { type: 'audio/wav' });
         }
@@ -181,89 +161,42 @@
             const files = document.getElementById('file-input').files;
             const bgmFile = document.getElementById('bgm-input').files[0];
             const bgmVolume = parseFloat(volumeSlider.value);
-            
             if (files.length === 0) return alert("Pilih file suaranya dulu bos!");
-
             const delayInputs = document.querySelectorAll('.delay-val');
-            let delayValues = [];
-            delayInputs.forEach(input => delayValues.push(parseFloat(input.value) || 0));
-
-            btnGabung.innerText = "⏳ Sedang Memproses Audio & Jeda...";
-            btnGabung.disabled = true;
-
+            let delayValues = []; delayInputs.forEach(input => delayValues.push(parseFloat(input.value) || 0));
+            btnGabung.innerText = "⏳ Sedang Memproses Audio & Jeda..."; btnGabung.disabled = true;
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
                 let voiceBuffers = [];
                 for (let i = 0; i < files.length; i++) {
-                    const arrayBuffer = await files[i].arrayBuffer();
-                    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-                    voiceBuffers.push(audioBuffer);
+                    const arrayBuffer = await files[i].arrayBuffer(); const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer); voiceBuffers.push(audioBuffer);
                 }
-                
                 let totalDuration = 0;
                 for (let i = 0; i < voiceBuffers.length; i++) {
-                    totalDuration += voiceBuffers[i].duration;
-                    if (i < voiceBuffers.length - 1) {
-                        totalDuration += delayValues[i] || 0; 
-                    }
+                    totalDuration += voiceBuffers[i].duration; if (i < voiceBuffers.length - 1) { totalDuration += delayValues[i] || 0; }
                 }
                 if (totalDuration === 0) totalDuration = 0.1;
-
                 const sampleRate = voiceBuffers[0].sampleRate || 44100;
                 const offlineCtx = new OfflineAudioContext(2, Math.ceil(sampleRate * totalDuration), sampleRate);
-                
                 let currentTime = 0;
                 for (let i = 0; i < voiceBuffers.length; i++) {
-                    const source = offlineCtx.createBufferSource();
-                    source.buffer = voiceBuffers[i];
-                    source.connect(offlineCtx.destination);
-                    source.start(currentTime);
-                    
-                    currentTime += voiceBuffers[i].duration;
-                    if (i < voiceBuffers.length - 1) {
-                        currentTime += delayValues[i] || 0; 
-                    }
+                    const source = offlineCtx.createBufferSource(); source.buffer = voiceBuffers[i]; source.connect(offlineCtx.destination); source.start(currentTime);
+                    currentTime += voiceBuffers[i].duration; if (i < voiceBuffers.length - 1) { currentTime += delayValues[i] || 0; }
                 }
-                
                 if (bgmFile) {
-                    const bgmArrayBuffer = await bgmFile.arrayBuffer();
-                    const bgmBuffer = await audioCtx.decodeAudioData(bgmArrayBuffer);
-                    const bgmSource = offlineCtx.createBufferSource();
-                    bgmSource.buffer = bgmBuffer;
-                    bgmSource.loop = true; 
-                    
-                    const gainNode = offlineCtx.createGain();
-                    gainNode.gain.value = bgmVolume; 
-                    
-                    bgmSource.connect(gainNode);
-                    gainNode.connect(offlineCtx.destination);
-                    bgmSource.start(0);
+                    const bgmArrayBuffer = await bgmFile.arrayBuffer(); const bgmBuffer = await audioCtx.decodeAudioData(bgmArrayBuffer);
+                    const bgmSource = offlineCtx.createBufferSource(); bgmSource.buffer = bgmBuffer; bgmSource.loop = true; 
+                    const gainNode = offlineCtx.createGain(); gainNode.gain.value = bgmVolume; 
+                    bgmSource.connect(gainNode); gainNode.connect(offlineCtx.destination); bgmSource.start(0);
                 }
-                
-                const renderedBuffer = await offlineCtx.startRendering();
-                const wavBlob = audioBufferToWav(renderedBuffer);
-                
-                const finalUrl = URL.createObjectURL(wavBlob);
-                const audioPlayer = document.getElementById('audio-player');
-                const downloadLink = document.getElementById('download-link');
-                const resultArea = document.getElementById('result-area');
-
-                audioPlayer.src = finalUrl;
-                downloadLink.href = finalUrl;
-                
-                const d = new Date();
-                const waktu = `${d.getDate()}-${d.getMonth() + 1}_${d.getHours()}-${d.getMinutes()}`;
+                const renderedBuffer = await offlineCtx.startRendering(); const wavBlob = audioBufferToWav(renderedBuffer);
+                const finalUrl = URL.createObjectURL(wavBlob); const audioPlayer = document.getElementById('audio-player'); const downloadLink = document.getElementById('download-link');
+                audioPlayer.src = finalUrl; downloadLink.href = finalUrl;
+                const d = new Date(); const waktu = `${d.getDate()}-${d.getMonth() + 1}_${d.getHours()}-${d.getMinutes()}`;
                 downloadLink.download = `Audio-Final-CustomJeda_${waktu}.wav`; 
-                
-                resultArea.classList.remove('hidden');
-            } catch (err) {
-                console.error(err);
-                alert("Gagal memproses. File audio mungkin tidak valid atau HP kehabisan memori.");
-            }
-
-            btnGabung.innerText = "Gabung & Proses Mix 🚀";
-            btnGabung.disabled = false;
+                document.getElementById('result-area').classList.remove('hidden');
+            } catch (err) { console.error(err); alert("Gagal memproses. File audio mungkin tidak valid atau HP kehabisan memori."); }
+            btnGabung.innerText = "Gabung & Proses Mix 🚀"; btnGabung.disabled = false;
         };
     </script>
 </body>
