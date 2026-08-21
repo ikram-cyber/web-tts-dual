@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penyambung Suara AI</title>
+    <title>Audio Joiner & Mixer AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -13,26 +13,38 @@
             🔙 Kembali ke TTS
         </a>
 
-        <h2 class="text-2xl font-bold text-blue-400 mt-4 mb-2 text-center">Audio Joiner</h2>
+        <h2 class="text-2xl font-bold text-blue-400 mt-4 mb-2 text-center">Audio Joiner + BGM</h2>
         
-        <p class="text-sm text-gray-400 mb-6 text-center">Pilih beberapa file MP3 pendek, lalu gabungkan jadi 1 file panjang.</p>
+        <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan part suara AI dan tambahkan musik latar secara otomatis.</p>
 
         <div class="space-y-4">
+            <!-- Input Suara AI -->
             <div>
-                <label class="block text-sm font-medium mb-2">Pilih File MP3 (Sesuai Urutan)</label>
+                <label class="block text-sm font-medium mb-2">1. Pilih File Suara AI (Sesuai Urutan)</label>
                 <input type="file" id="file-input" multiple accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 bg-gray-700 rounded-lg p-2 cursor-pointer">
             </div>
 
-            <button id="btn-gabung" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                Gabung Jadi Satu 🚀
+            <!-- Input Musik Latar -->
+            <div class="mt-4 p-4 border border-gray-600 rounded-lg bg-gray-750 bg-gray-700">
+                <label class="block text-sm font-medium mb-2 text-yellow-400">2. Tambah Musik Latar (Opsional)</label>
+                <input type="file" id="bgm-input" accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-yellow-600 file:text-white hover:file:bg-yellow-700 bg-gray-800 rounded-lg p-2 cursor-pointer">
+                
+                <div class="mt-4">
+                    <label class="block text-xs text-gray-300 mb-1">Volume Musik Latar: <span id="vol-val">10%</span></label>
+                    <input type="range" id="bgm-volume" min="0.01" max="1" step="0.01" value="0.1" class="w-full cursor-pointer">
+                </div>
+            </div>
+
+            <button id="btn-gabung" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 mt-2">
+                Gabung & Proses Mix 🚀
             </button>
         </div>
 
         <div id="result-area" class="mt-6 hidden space-y-4 pt-6 border-t border-gray-700">
-            <p class="text-sm text-green-400 text-center font-bold">Sukses digabung! Silakan putar atau download:</p>
+            <p class="text-sm text-green-400 text-center font-bold">✅ Berhasil diracik! Silakan download:</p>
             <audio id="audio-player" controls class="w-full rounded-lg"></audio>
             <a id="download-link" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                ⬇️ Download Audio Panjang
+                ⬇️ Download Audio Final
             </a>
         </div>
     </div>
@@ -43,33 +55,132 @@
     </footer>
 
     <script>
-        document.getElementById('btn-gabung').onclick = async () => {
-            const files = document.getElementById('file-input').files;
-            
-            if (files.length === 0) return alert("Pilih file suaranya dulu bos!");
-            if (files.length === 1) return alert("Minimal pilih 2 file biar bisa digabung!");
+        // Update teks volume saat slider digeser
+        const volumeSlider = document.getElementById('bgm-volume');
+        const volVal = document.getElementById('vol-val');
+        volumeSlider.oninput = function() {
+            volVal.innerHTML = Math.round(this.value * 100) + "%";
+        }
 
-            let blobs = [];
-            for (let i = 0; i < files.length; i++) {
-                blobs.push(files[i]);
+        // Fungsi mengubah AudioBuffer hasil mix menjadi file WAV
+        function audioBufferToWav(buffer) {
+            const numChannels = buffer.numberOfChannels;
+            const sampleRate = buffer.sampleRate;
+            let result;
+            if (numChannels === 2) {
+                result = new Float32Array(buffer.length * 2);
+                const left = buffer.getChannelData(0);
+                const right = buffer.getChannelData(1);
+                for (let i = 0; i < buffer.length; i++) {
+                    result[i * 2] = left[i];
+                    result[i * 2 + 1] = right[i];
+                }
+            } else {
+                result = buffer.getChannelData(0);
+            }
+            
+            const dataLength = result.length * 2;
+            const bufferArray = new ArrayBuffer(44 + dataLength);
+            const view = new DataView(bufferArray);
+            
+            const writeString = (view, offset, string) => {
+                for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+            };
+            
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataLength, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * numChannels * 2, true);
+            view.setUint16(32, numChannels * 2, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataLength, true);
+            
+            let offset = 44;
+            for (let i = 0; i < result.length; i++, offset += 2) {
+                let s = Math.max(-1, Math.min(1, result[i]));
+                view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+            }
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        const btnGabung = document.getElementById('btn-gabung');
+        btnGabung.onclick = async () => {
+            const files = document.getElementById('file-input').files;
+            const bgmFile = document.getElementById('bgm-input').files[0];
+            const bgmVolume = parseFloat(volumeSlider.value);
+            
+            if (files.length === 0) return alert("Pilih file suara AI-nya dulu bos!");
+
+            btnGabung.innerText = "⏳ Sedang Memproses & Mixing...";
+            btnGabung.disabled = true;
+
+            try {
+                let voiceBlobs = [];
+                for (let i = 0; i < files.length; i++) voiceBlobs.push(files[i]);
+                const voiceBlob = new Blob(voiceBlobs, { type: 'audio/mp3' });
+                
+                let finalUrl = "";
+                let extension = "mp3";
+
+                if (!bgmFile) {
+                    // Jika tidak ada musik, gabung instan seperti biasa
+                    finalUrl = URL.createObjectURL(voiceBlob);
+                } else {
+                    // Jika ada musik, jalankan mesin Web Audio Mixer
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const voiceBuffer = await audioCtx.decodeAudioData(await voiceBlob.arrayBuffer());
+                    const bgmBuffer = await audioCtx.decodeAudioData(await bgmFile.arrayBuffer());
+                    
+                    const offlineCtx = new OfflineAudioContext(2, voiceBuffer.length, voiceBuffer.sampleRate);
+                    
+                    const voiceSource = offlineCtx.createBufferSource();
+                    voiceSource.buffer = voiceBuffer;
+                    voiceSource.connect(offlineCtx.destination);
+                    voiceSource.start(0);
+                    
+                    const bgmSource = offlineCtx.createBufferSource();
+                    bgmSource.buffer = bgmBuffer;
+                    bgmSource.loop = true; // Musik akan mengulang otomatis jika durasi kurang
+                    
+                    const gainNode = offlineCtx.createGain();
+                    gainNode.gain.value = bgmVolume; 
+                    
+                    bgmSource.connect(gainNode);
+                    gainNode.connect(offlineCtx.destination);
+                    bgmSource.start(0);
+                    
+                    const renderedBuffer = await offlineCtx.startRendering();
+                    const wavBlob = audioBufferToWav(renderedBuffer);
+                    
+                    finalUrl = URL.createObjectURL(wavBlob);
+                    extension = "wav"; // Hasil akhir wajib WAV jika dimixing di browser
+                }
+                
+                const audioPlayer = document.getElementById('audio-player');
+                const downloadLink = document.getElementById('download-link');
+                const resultArea = document.getElementById('result-area');
+
+                audioPlayer.src = finalUrl;
+                downloadLink.href = finalUrl;
+                
+                const d = new Date();
+                const waktu = `${d.getDate()}-${d.getMonth() + 1}_${d.getHours()}-${d.getMinutes()}`;
+                downloadLink.download = `Audio-Final_${waktu}.${extension}`; 
+                
+                resultArea.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+                alert("Gagal memproses. HP kamu mungkin kehabisan memori untuk audio yang terlalu panjang.");
             }
 
-            const finalBlob = new Blob(blobs, { type: 'audio/mp3' });
-            const url = URL.createObjectURL(finalBlob);
-
-            const audioPlayer = document.getElementById('audio-player');
-            const downloadLink = document.getElementById('download-link');
-            const resultArea = document.getElementById('result-area');
-
-            audioPlayer.src = url;
-            downloadLink.href = url;
-            
-            const d = new Date();
-            const waktu = `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}_${d.getHours()}-${d.getMinutes()}-${d.getSeconds()}`;
-            
-            downloadLink.download = `Audio-Gabungan_${waktu}.mp3`; 
-            
-            resultArea.classList.remove('hidden');
+            btnGabung.innerText = "Gabung & Proses Mix 🚀";
+            btnGabung.disabled = false;
         };
     </script>
 </body>
