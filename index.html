@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Web TTS Dual</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4659624818164596" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
     <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-lg border border-gray-700 relative">
@@ -52,23 +50,26 @@
     <footer class="mt-8 text-center text-xs text-gray-500">
         &copy; 2026 ikram-cyber. All rights reserved.
     </footer>
-<!-- Google Native Widget (Super Clean) -->
+<!-- Google Native Widget (God Mode) -->
 <style>
-  /* BANTAI BANNER ATAS & POPUP TOOLTIP */
-  iframe.goog-te-banner-frame { display: none !important; visibility: hidden !important; }
-  .goog-te-banner-frame { display: none !important; visibility: hidden !important; }
+  /* 1. BASMI BANNER GOOGLE VERSI BARU & LAMA */
+  body > div.skiptranslate { display: none !important; }
+  .VIpgJd-Zvi9od-aZ2wEe-wOHMyf, .VIpgJd-Zvi9od-aZ2wEe-wOHMyf-ti6hGc { display: none !important; }
+  iframe.goog-te-banner-frame { display: none !important; }
+  
+  /* 2. KEMBALIKAN POSISI HALAMAN KE ATAS */
+  body { top: 0px !important; position: static !important; margin-top: 0px !important; }
+  html { top: 0px !important; margin-top: 0px !important; }
+  
+  /* 3. BASMI POPUP HOVER KUNING/PUTIH */
   #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
   .goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }
   
-  /* PAKSA HALAMAN TETAP DI ATAS */
-  body { top: 0px !important; position: static !important; }
-  html { height: auto !important; }
-  
-  /* BANTAI LOGO BAWAH */
-  .goog-logo-link, .goog-te-gadget img, .goog-te-gadget a { display: none !important; }
+  /* 4. BASMI TULISAN GOOGLE DI BAWAH */
+  .goog-logo-link { display: none !important; }
   .goog-te-gadget { color: transparent !important; font-size: 0px !important; }
   
-  /* PERCANTIK KOTAK PILIHAN */
+  /* 5. PERCANTIK KOTAK PILIHAN BAHASA */
   .goog-te-combo {
     background-color: #374151 !important;
     color: #ffffff !important;
@@ -90,16 +91,22 @@
   function googleTranslateElementInit() {
     new google.translate.TranslateElement({
       pageLanguage: 'id',
-      autoDisplay: false // Mencegah banner maksa muncul
+      autoDisplay: false
     }, 'google_translate_element');
   }
   
-  /* JAVASCRIPT SATPAM: Tarik paksa web ke atas kalau Google maksa nurunin */
+  /* JAVASCRIPT GOD MODE: Basmi banner class terbaru secara agresif */
   setInterval(function() {
-    if (document.body.style.top !== '0px') {
-        document.body.style.top = '0px';
-    }
-  }, 100);
+    document.querySelectorAll('.VIpgJd-Zvi9od-aZ2wEe-wOHMyf').forEach(function(el) {
+      el.style.display = 'none';
+    });
+    document.querySelectorAll('iframe.goog-te-banner-frame').forEach(function(el) {
+      el.style.display = 'none';
+    });
+    if(document.body.style.top !== '0px') document.body.style.top = '0px';
+    if(document.body.style.marginTop !== '0px') document.body.style.marginTop = '0px';
+    if(document.documentElement.style.marginTop !== '0px') document.documentElement.style.marginTop = '0px';
+  }, 50);
 </script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     
@@ -168,6 +175,5 @@
                 downloadList.appendChild(btn);
             });
         });
-    </script>
 </body>
 </html>
