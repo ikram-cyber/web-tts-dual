@@ -3,14 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio & Video Joiner AI</title>
-    
-    <!-- AKAL-AKALAN 1: Bypass Limit Memori Browser (Wajib ada di paling atas) -->
-    <script src="https://cdn.jsdelivr.net/gh/gzuidhof/coi-serviceworker@master/coi-serviceworker.js"></script>
-    
-    <!-- AKAL-AKALAN 2: Mesin FFmpeg versi Browser -->
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.6/dist/ffmpeg.min.js"></script>
-    
+    <title>Audio Joiner & Mixer AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
@@ -20,51 +13,56 @@
             🔙 Kembali ke TTS
         </a>
 
-        <h2 class="text-2xl font-bold text-blue-400 mt-4 mb-2 text-center">Studio Mini AI</h2>
+        <h2 class="text-2xl font-bold text-blue-400 mt-4 mb-2 text-center">Audio Joiner + BGM</h2>
         
-        <p class="text-sm text-gray-400 mb-6 text-center">Gabung suara AI, BGM, dan suntikkan langsung ke Video HD.</p>
+        <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan part suara AI dan tambahkan musik latar secara otomatis.</p>
 
         <div class="space-y-4">
-            <!-- 1. Input Suara AI -->
+            <!-- Input Suara AI -->
             <div>
-                <label class="block text-sm font-medium mb-2">1. File Suara AI (Wajib)</label>
+                <label class="block text-sm font-medium mb-2">1. Pilih File Suara AI (Sesuai Urutan)</label>
                 <input type="file" id="file-input" multiple accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 bg-gray-700 rounded-lg p-2 cursor-pointer">
             </div>
 
-            <!-- 2. Input Musik Latar -->
-            <div class="p-4 border border-gray-600 rounded-lg bg-gray-750">
-                <label class="block text-sm font-medium mb-2 text-yellow-400">2. Musik Latar (Opsional)</label>
+            <!-- Input Musik Latar -->
+            <div class="mt-4 p-4 border border-gray-600 rounded-lg bg-gray-750 bg-gray-700">
+                <label class="block text-sm font-medium mb-2 text-yellow-400">2. Tambah Musik Latar (Opsional)</label>
                 <input type="file" id="bgm-input" accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-yellow-600 file:text-white hover:file:bg-yellow-700 bg-gray-800 rounded-lg p-2 cursor-pointer">
                 
                 <div class="mt-4">
-                    <label class="block text-xs text-gray-300 mb-1">Volume BGM: <span id="vol-val">10%</span></label>
+                    <label class="block text-xs text-gray-300 mb-1">Volume Musik Latar: <span id="vol-val">10%</span></label>
                     <input type="range" id="bgm-volume" min="0.01" max="1" step="0.01" value="0.1" class="w-full cursor-pointer">
                 </div>
             </div>
 
-            <!-- 3. Input Video Murni -->
-            <div class="p-4 border border-blue-500 rounded-lg bg-gray-800 shadow-inner">
-                <label class="block text-sm font-medium mb-2 text-blue-300">3. Video Mentahan 1080p (Opsional)</label>
-                <input type="file" id="video-input" accept="video/mp4" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 bg-gray-900 rounded-lg p-2 cursor-pointer">
-                <p class="text-xs text-gray-400 mt-2">*Hanya menerima format .mp4. Biarkan kosong jika hanya ingin gabung MP3.</p>
-            </div>
-
-            <button id="btn-gabung" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 mt-4 shadow-lg shadow-green-900">
-                🚀 Eksekusi Render!
+            <button id="btn-gabung" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 mt-2">
+                Gabung & Proses Mix 🚀
             </button>
         </div>
 
-        <div id="result-area" class="mt-6 hidden space-y-4 pt-6 border-t border-gray-700 w-full flex flex-col items-center">
-            <!-- Area Hasil Akan Dimunculkan via JS -->
+        <div id="result-area" class="mt-6 hidden space-y-4 pt-6 border-t border-gray-700">
+            <p class="text-sm text-green-400 text-center font-bold">✅ Berhasil diracik! Silakan download:</p>
+            <audio id="audio-player" controls class="w-full rounded-lg"></audio>
+            <a id="download-link" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                ⬇️ Download Audio Final
+            </a>
         </div>
     </div>
 
+    <!-- Copyright Footer -->
+    <footer class="mt-8 text-center text-xs text-gray-500">
+        &copy; 2026 ikram-cyber. All rights reserved.
+    </footer>
+
     <script>
+        // Update teks volume saat slider digeser
         const volumeSlider = document.getElementById('bgm-volume');
         const volVal = document.getElementById('vol-val');
-        volumeSlider.oninput = function() { volVal.innerHTML = Math.round(this.value * 100) + "%"; }
+        volumeSlider.oninput = function() {
+            volVal.innerHTML = Math.round(this.value * 100) + "%";
+        }
 
-        // Fungsi convert Audio Buffer ke WAV
+        // Fungsi mengubah AudioBuffer hasil mix menjadi file WAV
         function audioBufferToWav(buffer) {
             const numChannels = buffer.numberOfChannels;
             const sampleRate = buffer.sampleRate;
@@ -80,10 +78,15 @@
             } else {
                 result = buffer.getChannelData(0);
             }
+            
             const dataLength = result.length * 2;
             const bufferArray = new ArrayBuffer(44 + dataLength);
             const view = new DataView(bufferArray);
-            const writeString = (view, offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
+            
+            const writeString = (view, offset, string) => {
+                for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+            };
+            
             writeString(view, 0, 'RIFF');
             view.setUint32(4, 36 + dataLength, true);
             writeString(view, 8, 'WAVE');
@@ -97,6 +100,7 @@
             view.setUint16(34, 16, true);
             writeString(view, 36, 'data');
             view.setUint32(40, dataLength, true);
+            
             let offset = 44;
             for (let i = 0; i < result.length; i++, offset += 2) {
                 let s = Math.max(-1, Math.min(1, result[i]));
@@ -105,37 +109,36 @@
             return new Blob([view], { type: 'audio/wav' });
         }
 
-        // Setup FFmpeg
-        const { createFFmpeg, fetchFile } = FFmpeg;
-        let ffmpeg = null;
-
         const btnGabung = document.getElementById('btn-gabung');
         btnGabung.onclick = async () => {
             const files = document.getElementById('file-input').files;
             const bgmFile = document.getElementById('bgm-input').files[0];
-            const videoFile = document.getElementById('video-input').files[0];
             const bgmVolume = parseFloat(volumeSlider.value);
             
             if (files.length === 0) return alert("Pilih file suara AI-nya dulu bos!");
 
-            btnGabung.innerText = "⏳ 1/3 Membaca File...";
+            btnGabung.innerText = "⏳ Sedang Memproses & Mixing...";
             btnGabung.disabled = true;
 
             try {
-                // 1. GABUNGKAN SUARA AI
                 let voiceBlobs = [];
                 for (let i = 0; i < files.length; i++) voiceBlobs.push(files[i]);
-                let finalAudioBlob = new Blob(voiceBlobs, { type: 'audio/mp3' });
-                let audioExt = "mp3";
+                const voiceBlob = new Blob(voiceBlobs, { type: 'audio/mp3' });
+                
+                let finalUrl = "";
+                let extension = "mp3";
 
-                // 2. JIKA ADA BGM, LAKUKAN MIXING
-                if (bgmFile) {
-                    btnGabung.innerText = "⏳ 2/3 Mixing Musik (Agak berat)...";
+                if (!bgmFile) {
+                    // Jika tidak ada musik, gabung instan seperti biasa
+                    finalUrl = URL.createObjectURL(voiceBlob);
+                } else {
+                    // Jika ada musik, jalankan mesin Web Audio Mixer
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const voiceBuffer = await audioCtx.decodeAudioData(await finalAudioBlob.arrayBuffer());
+                    const voiceBuffer = await audioCtx.decodeAudioData(await voiceBlob.arrayBuffer());
                     const bgmBuffer = await audioCtx.decodeAudioData(await bgmFile.arrayBuffer());
                     
                     const offlineCtx = new OfflineAudioContext(2, voiceBuffer.length, voiceBuffer.sampleRate);
+                    
                     const voiceSource = offlineCtx.createBufferSource();
                     voiceSource.buffer = voiceBuffer;
                     voiceSource.connect(offlineCtx.destination);
@@ -143,7 +146,7 @@
                     
                     const bgmSource = offlineCtx.createBufferSource();
                     bgmSource.buffer = bgmBuffer;
-                    bgmSource.loop = true; 
+                    bgmSource.loop = true; // Musik akan mengulang otomatis jika durasi kurang
                     
                     const gainNode = offlineCtx.createGain();
                     gainNode.gain.value = bgmVolume; 
@@ -153,60 +156,30 @@
                     bgmSource.start(0);
                     
                     const renderedBuffer = await offlineCtx.startRendering();
-                    finalAudioBlob = audioBufferToWav(renderedBuffer);
-                    audioExt = "wav";
+                    const wavBlob = audioBufferToWav(renderedBuffer);
+                    
+                    finalUrl = URL.createObjectURL(wavBlob);
+                    extension = "wav"; // Hasil akhir wajib WAV jika dimixing di browser
                 }
-
+                
+                const audioPlayer = document.getElementById('audio-player');
+                const downloadLink = document.getElementById('download-link');
                 const resultArea = document.getElementById('result-area');
+
+                audioPlayer.src = finalUrl;
+                downloadLink.href = finalUrl;
+                
                 const d = new Date();
                 const waktu = `${d.getDate()}-${d.getMonth() + 1}_${d.getHours()}-${d.getMinutes()}`;
-
-                // 3. JIKA ADA VIDEO, SUNTIKKAN AUDIO KE VIDEO (MUXING)
-                if (videoFile) {
-                    btnGabung.innerText = "⏳ 3/3 Menyuntikkan Audio ke Video HD...";
-                    
-                    if (!ffmpeg) {
-                        ffmpeg = createFFmpeg({ log: true });
-                        await ffmpeg.load();
-                    }
-
-                    // Tulis file ke memori browser
-                    ffmpeg.FS('writeFile', `audio.${audioExt}`, await fetchFile(finalAudioBlob));
-                    ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(videoFile));
-
-                    // MANTRA SUNTIK (-c:v copy artinya video TIDAK dirender ulang, super cepat!)
-                    await ffmpeg.run('-i', 'video.mp4', '-i', `audio.${audioExt}`, '-c:v', 'copy', '-c:a', 'aac', '-map', '0:v:0', '-map', '1:a:0', '-shortest', 'output.mp4');
-
-                    const data = ffmpeg.FS('readFile', 'output.mp4');
-                    const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-                    const finalUrl = URL.createObjectURL(videoBlob);
-
-                    resultArea.innerHTML = `
-                        <p class="text-sm text-green-400 text-center font-bold">✅ Video HD Siap! Resolusi tetap jernih!</p>
-                        <video controls src="${finalUrl}" class="w-full rounded-lg border border-gray-600"></video>
-                        <a href="${finalUrl}" download="Video-Final_${waktu}.mp4" class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 mt-2 shadow-lg">
-                            🎬 Download Video 1080p
-                        </a>
-                    `;
-                } else {
-                    // JIKA HANYA AUDIO
-                    const finalUrl = URL.createObjectURL(finalAudioBlob);
-                    resultArea.innerHTML = `
-                        <p class="text-sm text-green-400 text-center font-bold">✅ Audio Berhasil Diracik!</p>
-                        <audio controls src="${finalUrl}" class="w-full rounded-lg"></audio>
-                        <a href="${finalUrl}" download="Audio-Final_${waktu}.${audioExt}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 mt-2 shadow-lg">
-                            🎵 Download Audio Final
-                        </a>
-                    `;
-                }
+                downloadLink.download = `Audio-Final_${waktu}.${extension}`; 
                 
                 resultArea.classList.remove('hidden');
             } catch (err) {
                 console.error(err);
-                alert("Waduh, HP kamu sepertinya kehabisan RAM. Coba bersihkan background apps atau gunakan video yang lebih pendek.");
+                alert("Gagal memproses. HP kamu mungkin kehabisan memori untuk audio yang terlalu panjang.");
             }
 
-            btnGabung.innerText = "🚀 Eksekusi Render!";
+            btnGabung.innerText = "Gabung & Proses Mix 🚀";
             btnGabung.disabled = false;
         };
     </script>
