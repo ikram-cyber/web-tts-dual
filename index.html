@@ -52,15 +52,18 @@
     <footer class="mt-8 text-center text-xs text-gray-500">
         &copy; 2026 ikram-cyber. All rights reserved.
     </footer>
-<!-- Google Native Widget (Mobile Friendly Picker) -->
+<!-- Google Native Widget (Mobile & Clean) -->
 <style>
-  /* Sembunyikan embel-embel "Powered by Google" */
-  .goog-logo-link { display: none !important; }
-  .goog-te-gadget { color: transparent !important; font-size: 0px !important; }
-  .goog-te-banner-frame.skiptranslate { display: none !important; }
-  body { top: 0px !important; }
+  /* BANTAI BANNER PUTIH DI ATAS */
+  .goog-te-banner-frame { display: none !important; }
+  .skiptranslate > iframe.goog-te-banner-frame { display: none !important; }
+  body { top: 0px !important; position: static !important; }
   
-  /* Percantik tombol dropdown-nya biar senada dengan aplikasi bos */
+  /* BANTAI LOGO & TULISAN GOOGLE DI BAWAH */
+  .goog-logo-link, .goog-te-gadget img, .goog-te-gadget a { display: none !important; }
+  .goog-te-gadget { color: transparent !important; font-size: 0px !important; }
+  
+  /* PERCANTIK KOTAK PILIHAN BAHASANYA */
   .goog-te-combo {
     background-color: #374151 !important;
     color: #ffffff !important;
@@ -72,16 +75,16 @@
     min-width: 150px;
     outline: none !important;
     cursor: pointer;
+    margin: 0 !important;
   }
 </style>
-<div class="mt-8 mb-10 text-center">
+<div class="mt-8 mb-10 flex justify-center">
     <div id="google_translate_element"></div>
 </div>
 <script type="text/javascript">
   function googleTranslateElementInit() {
     new google.translate.TranslateElement({
       pageLanguage: 'id'
-      // Kita buang kode "layout:" di sini supaya Google memakai sistem dropdown asli HP
     }, 'google_translate_element');
   }
 </script>
