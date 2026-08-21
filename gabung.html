@@ -15,7 +15,7 @@
 
         <h2 class="text-2xl font-bold text-blue-400 mt-4 mb-2 text-center">Audio Joiner + BGM</h2>
         
-        <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan part suara dan tambahkan musik latar secara otomatis.</p>
+        <p class="text-sm text-gray-400 mb-6 text-center">Gabungkan part suara, atur jeda otomatis, dan tambah musik latar.</p>
 
         <div class="space-y-4">
             <!-- Input Suara Utama -->
@@ -24,8 +24,19 @@
                 <input type="file" id="file-input" multiple accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 bg-gray-700 rounded-lg p-2 cursor-pointer">
             </div>
 
+            <!-- Fitur Baru: Pengaturan Jeda -->
+            <div class="mt-2 p-4 border border-gray-600 rounded-lg bg-gray-750">
+                <label class="block text-sm font-medium mb-2 text-blue-300">Pengaturan Jeda Suara</label>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-400">Beri jeda antar part:</span>
+                    <input type="number" id="delay-input" min="0" step="0.5" value="0" class="w-20 bg-gray-900 border border-gray-500 rounded p-1 text-center text-white outline-none focus:border-blue-500 font-bold">
+                    <span class="text-sm text-gray-400">Detik</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">*Isi 0 jika ingin nyambung terus tanpa henti.</p>
+            </div>
+
             <!-- Input Musik Latar -->
-            <div class="mt-4 p-4 border border-gray-600 rounded-lg bg-gray-750 bg-gray-700">
+            <div class="mt-4 p-4 border border-gray-600 rounded-lg bg-gray-750">
                 <label class="block text-sm font-medium mb-2 text-yellow-400">2. Tambah Musik Latar (Opsional)</label>
                 <input type="file" id="bgm-input" accept="audio/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-yellow-600 file:text-white hover:file:bg-yellow-700 bg-gray-800 rounded-lg p-2 cursor-pointer">
                 
@@ -44,7 +55,7 @@
             <p class="text-sm text-green-400 text-center font-bold">✅ Berhasil diracik! Silakan download:</p>
             <audio id="audio-player" controls class="w-full rounded-lg"></audio>
             <a id="download-link" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                ⬇️ Download Audio Final
+                ⬇️ Download Audio Final (.WAV)
             </a>
         </div>
     </div>
@@ -55,14 +66,10 @@
     </footer>
 
     <script>
-        // Update teks volume saat slider digeser
         const volumeSlider = document.getElementById('bgm-volume');
         const volVal = document.getElementById('vol-val');
-        volumeSlider.oninput = function() {
-            volVal.innerHTML = Math.round(this.value * 100) + "%";
-        }
+        volumeSlider.oninput = function() { volVal.innerHTML = Math.round(this.value * 100) + "%"; }
 
-        // Fungsi mengubah AudioBuffer hasil mix menjadi file WAV
         function audioBufferToWav(buffer) {
             const numChannels = buffer.numberOfChannels;
             const sampleRate = buffer.sampleRate;
@@ -83,22 +90,13 @@
             const bufferArray = new ArrayBuffer(44 + dataLength);
             const view = new DataView(bufferArray);
             
-            const writeString = (view, offset, string) => {
-                for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-            };
-            
-            writeString(view, 0, 'RIFF');
-            view.setUint32(4, 36 + dataLength, true);
-            writeString(view, 8, 'WAVE');
-            writeString(view, 12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, numChannels, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * numChannels * 2, true);
-            view.setUint16(32, numChannels * 2, true);
-            view.setUint16(34, 16, true);
-            writeString(view, 36, 'data');
+            const writeString = (view, offset, string) => { for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i)); };
+            writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + dataLength, true);
+            writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * numChannels * 2, true); view.setUint16(32, numChannels * 2, true);
+            view.setUint16(34, 16, true); writeString(view, 36, 'data');
             view.setUint32(40, dataLength, true);
             
             let offset = 44;
@@ -114,39 +112,53 @@
             const files = document.getElementById('file-input').files;
             const bgmFile = document.getElementById('bgm-input').files[0];
             const bgmVolume = parseFloat(volumeSlider.value);
+            const delaySeconds = parseFloat(document.getElementById('delay-input').value) || 0;
             
             if (files.length === 0) return alert("Pilih file suaranya dulu bos!");
 
-            btnGabung.innerText = "⏳ Sedang Memproses & Mixing...";
+            btnGabung.innerText = "⏳ Sedang Memproses Audio & Jeda...";
             btnGabung.disabled = true;
 
             try {
-                let voiceBlobs = [];
-                for (let i = 0; i < files.length; i++) voiceBlobs.push(files[i]);
-                const voiceBlob = new Blob(voiceBlobs, { type: 'audio/mp3' });
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 
-                let finalUrl = "";
-                let extension = "mp3";
+                // 1. Decode semua file suara yang diupload
+                let voiceBuffers = [];
+                for (let i = 0; i < files.length; i++) {
+                    const arrayBuffer = await files[i].arrayBuffer();
+                    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                    voiceBuffers.push(audioBuffer);
+                }
+                
+                // 2. Hitung total durasi (termasuk jeda)
+                let totalDuration = 0;
+                for (let i = 0; i < voiceBuffers.length; i++) {
+                    totalDuration += voiceBuffers[i].duration;
+                    if (i < voiceBuffers.length - 1) totalDuration += delaySeconds;
+                }
+                if (totalDuration === 0) totalDuration = 0.1;
 
-                if (!bgmFile) {
-                    // Jika tidak ada musik, gabung instan seperti biasa
-                    finalUrl = URL.createObjectURL(voiceBlob);
-                } else {
-                    // Jika ada musik, jalankan mesin Web Audio Mixer
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const voiceBuffer = await audioCtx.decodeAudioData(await voiceBlob.arrayBuffer());
-                    const bgmBuffer = await audioCtx.decodeAudioData(await bgmFile.arrayBuffer());
-                    
-                    const offlineCtx = new OfflineAudioContext(2, voiceBuffer.length, voiceBuffer.sampleRate);
-                    
-                    const voiceSource = offlineCtx.createBufferSource();
-                    voiceSource.buffer = voiceBuffer;
-                    voiceSource.connect(offlineCtx.destination);
-                    voiceSource.start(0);
-                    
+                // 3. Buat Kanvas Audio Utama
+                const sampleRate = voiceBuffers[0].sampleRate || 44100;
+                const offlineCtx = new OfflineAudioContext(2, Math.ceil(sampleRate * totalDuration), sampleRate);
+                
+                // 4. Susun suara sesuai urutan dengan jeda
+                let currentTime = 0;
+                for (let i = 0; i < voiceBuffers.length; i++) {
+                    const source = offlineCtx.createBufferSource();
+                    source.buffer = voiceBuffers[i];
+                    source.connect(offlineCtx.destination);
+                    source.start(currentTime);
+                    currentTime += voiceBuffers[i].duration + delaySeconds;
+                }
+                
+                // 5. Tambahkan Musik Latar jika ada
+                if (bgmFile) {
+                    const bgmArrayBuffer = await bgmFile.arrayBuffer();
+                    const bgmBuffer = await audioCtx.decodeAudioData(bgmArrayBuffer);
                     const bgmSource = offlineCtx.createBufferSource();
                     bgmSource.buffer = bgmBuffer;
-                    bgmSource.loop = true; // Musik akan mengulang otomatis jika durasi kurang
+                    bgmSource.loop = true; 
                     
                     const gainNode = offlineCtx.createGain();
                     gainNode.gain.value = bgmVolume; 
@@ -154,14 +166,13 @@
                     bgmSource.connect(gainNode);
                     gainNode.connect(offlineCtx.destination);
                     bgmSource.start(0);
-                    
-                    const renderedBuffer = await offlineCtx.startRendering();
-                    const wavBlob = audioBufferToWav(renderedBuffer);
-                    
-                    finalUrl = URL.createObjectURL(wavBlob);
-                    extension = "wav"; // Hasil akhir wajib WAV jika dimixing di browser
                 }
                 
+                // 6. Render dan Download
+                const renderedBuffer = await offlineCtx.startRendering();
+                const wavBlob = audioBufferToWav(renderedBuffer);
+                
+                const finalUrl = URL.createObjectURL(wavBlob);
                 const audioPlayer = document.getElementById('audio-player');
                 const downloadLink = document.getElementById('download-link');
                 const resultArea = document.getElementById('result-area');
@@ -171,12 +182,12 @@
                 
                 const d = new Date();
                 const waktu = `${d.getDate()}-${d.getMonth() + 1}_${d.getHours()}-${d.getMinutes()}`;
-                downloadLink.download = `Audio-Final_${waktu}.${extension}`; 
+                downloadLink.download = `Audio-Final_${waktu}.wav`; 
                 
                 resultArea.classList.remove('hidden');
             } catch (err) {
                 console.error(err);
-                alert("Gagal memproses. HP kamu mungkin kehabisan memori untuk audio yang terlalu panjang.");
+                alert("Gagal memproses. File audio mungkin tidak valid atau HP kehabisan memori.");
             }
 
             btnGabung.innerText = "Gabung & Proses Mix 🚀";
