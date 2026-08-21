@@ -65,12 +65,13 @@
     </footer>
 <!-- Google Translate Widget -->
 <div class="mt-6 mb-8 text-center px-4">
-    <div id="google_translate_element" class="inline-block scale-90 origin-center"></div>
+    <div id="google_translate_element" class="inline-block scale-90 origin-center" style="font-size: 12px;"></div>
 </div>
 <script type="text/javascript">
   function googleTranslateElementInit() {
     new google.translate.TranslateElement({
       pageLanguage: 'id', 
+      includedLanguages: 'id,en,ms,jv,su,ja,ko,zh-CN,es,ar,fr,de,ru,hi,th,vi,tl,it,pt',
       layout: google.translate.TranslateElement.InlineLayout.SIMPLE
     }, 'google_translate_element');
   }
